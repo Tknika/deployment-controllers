@@ -54,15 +54,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract Docker image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/${{ steps.extract.outputs.project }}
+          tags: |
+            ${{ steps.extract.outputs.version }}
+            latest
+
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./${{ steps.extract.outputs.project }}
           file: ./${{ steps.extract.outputs.project }}/Dockerfile
           push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ steps.extract.outputs.project }}:${{ steps.extract.outputs.version }}
-            ghcr.io/${{ github.repository_owner }}/${{ steps.extract.outputs.project }}:latest
+          tags: ${{ steps.meta.outputs.tags }}
           labels: |
             org.opencontainers.image.title=${{ steps.extract.outputs.project }}
             org.opencontainers.image.version=${{ steps.extract.outputs.version }}
