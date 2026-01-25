@@ -1,0 +1,37 @@
+# --- Virtual Environment ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Cache ---
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Build Artifacts ---
+dist/
+build/
+*.egg-info/
+.eggs/
+nosetests.xml
+coverage.xml
+.coverage
+htmlcov/
+
+# --- Git and Logs ---
+.git/
+.gitignore
+*.log
+
+# --- Local Configuration Files / Secrets ---
+.env
+*.swp
+.DS_Store
+
+# --- IDEs ---
+.vscode/
+.idea/

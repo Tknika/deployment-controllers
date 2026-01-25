@@ -1,0 +1,29 @@
+services:
+  4g-core-deployment-controller:
+    container_name: 4g-core-deployment-controller
+    image: 4g-core-deployment-controller:latest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - API_PORT=8000
+      - COMPOSE_FILE=/data/compose.yaml
+      - ENV_FILE=/data/.env
+      - LOG_LEVEL=info
+    volumes:
+      - ./compose.yaml:/data/compose.yaml
+      - ./.env:/data/.env
+      - /usr/bin/docker:/usr/bin/docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/libexec/docker/cli-plugins/docker-compose:/usr/libexec/docker/cli-plugins/docker-compose
+    networks:
+      default:
+        ipv4_address: 172.22.0.200
+
+networks:
+  default:
+    external: true
+    name: docker_open5gs_default
+    ipam:
+      config:
+        - subnet: ${INTERNAL_NETWORK_SUBNET}
