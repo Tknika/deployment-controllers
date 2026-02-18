@@ -113,7 +113,8 @@ async def update_subscriber(
     collection: AsyncIOMotorCollection = Depends(get_subscriber_collection),
 ):
     """Replace subscriber data by IMSI, enforcing path IMSI."""
-    update_dict = updated_data.model_dump(by_alias=True, exclude_none=True)
+    update_dict = updated_data.model_dump(by_alias=True, exclude={"id"}, exclude_none=True)
+    update_dict.pop("_id", None)
     update_dict["imsi"] = imsi
 
     try:

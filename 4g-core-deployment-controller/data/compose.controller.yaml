@@ -1,7 +1,7 @@
 services:
   4g-core-deployment-controller:
     container_name: 4g-core-deployment-controller
-    image: ghcr.io/tknika/4g-core-deployment-controller:v0.3.0
+    image: ghcr.io/tknika/4g-core-deployment-controller:v0.3.1
     restart: unless-stopped
     expose:
       - 8000
