@@ -81,7 +81,7 @@ class CoreInfoStreamService:
     @staticmethod
     def format_sse_message(event: str, payload: dict[str, Any]) -> str:
         """Build an SSE message string for one event."""
-        return f"event: {event}\\ndata: {json.dumps(payload, ensure_ascii=False)}\\n\\n"
+        return f"event: {event}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
 
     async def _fetch_snapshot(self) -> tuple[dict[str, Any] | None, str | None]:
         snapshot: dict[str, Any] = {}
