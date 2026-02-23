@@ -30,6 +30,30 @@ All connected UEs and their PDU sessions (IMSI/SUPI, DNN, IPs, S-NSSAI, QoS, sta
 
 > Calls should be forwarded to port 9090 of the container named SMF
 
+#### GET /core/info-stream
+SSE stream that provides real-time information for `enb-info`, `ue-info` and `pdu-info`.
+
+- Response content type: `text/event-stream`
+- Event types: `snapshot`, `update`
+- Polling interval is global and shared across all subscribers (default: 2 second)
+
+Behavior:
+
+- On connection, a `snapshot` event is always sent with full data for all 3 resources.
+- During the stream lifetime, an `update` event is sent only when there is a real change in one or more resources.
+- If Open5GS fails in a polling cycle, no event is emitted in that cycle.
+- If Open5GS is unreachable when opening the stream, the endpoint returns an error.
+
+SSE event examples:
+
+```text
+event: snapshot
+data: {"enb-info":[...],"ue-info":[...],"pdu-info":[...]}
+
+event: update
+data: {"ue-info":[...],"pdu-info":[...]}
+```
+
 #### GET /core/apns
 Returns all APNs defined in `DNN_LIST`.
 
