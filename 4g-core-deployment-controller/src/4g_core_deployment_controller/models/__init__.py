@@ -1,5 +1,6 @@
 """Models package for 4G core deployment controller."""
 
+from .apn import ApnCollectionReplaceRequest, ApnModel
 from .subscriber import (
     AmbrModel,
     QosModel,
@@ -10,6 +11,8 @@ from .subscriber import (
 )
 
 __all__ = [
+    "ApnCollectionReplaceRequest",
+    "ApnModel",
     "AmbrModel",
     "QosModel",
     "SecurityModel",

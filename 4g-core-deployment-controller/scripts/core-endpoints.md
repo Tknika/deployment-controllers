@@ -29,3 +29,79 @@ All connected LTE UEs and their info, active eNB, tai, and PDN info
 All connected UEs and their PDU sessions (IMSI/SUPI, DNN, IPs, S-NSSAI, QoS, state, etc.)
 
 > Calls should be forwarded to port 9090 of the container named SMF
+
+#### GET /core/apns
+Returns all APNs defined in `DNN_LIST`.
+
+Response format:
+
+```json
+[
+	{
+		"name": "internet",
+		"subnet": "192.168.100.0/24",
+		"interface": "ogstun"
+	},
+	{
+		"name": "ims",
+		"subnet": "192.168.101.0/24",
+		"interface": "ogstun2"
+	}
+]
+```
+
+#### POST /core/apns
+Creates a new APN.
+
+Payload:
+
+```json
+{
+	"name": "m2m",
+	"subnet": "192.168.110.0/24",
+	"interface": "ogstun3"
+}
+```
+
+#### PUT /core/apns/{name}
+Replaces a single APN by name with a full payload.
+
+Payload:
+
+```json
+{
+	"name": "internet",
+	"subnet": "192.168.100.0/24",
+	"interface": "ogstun"
+}
+```
+
+#### DELETE /core/apns/{name}
+Deletes a single APN by name.
+
+#### PUT /core/apns
+Replaces the full APN collection in a single operation.
+
+Payload:
+
+```json
+{
+	"apns": [
+		{
+			"name": "internet",
+			"subnet": "192.168.100.0/24",
+			"interface": "ogstun"
+		},
+		{
+			"name": "ims",
+			"subnet": "192.168.101.0/24",
+			"interface": "ogstun2"
+		}
+	]
+}
+```
+
+Notes:
+
+- Source of truth: `DNN_LIST`
+- Every mutation triggers environment update with service restart through `/envs`

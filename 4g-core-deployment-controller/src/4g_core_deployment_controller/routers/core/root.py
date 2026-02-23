@@ -19,6 +19,8 @@ async def get_core_endpoints():
     return {
         "endpoints": {
             "/subscribers": "Information and management of subscribers registered in the core",
+            "/apns": "List, create and replace APNs through DNN_LIST",
+            "/apns/{name}": "Replace or delete one APN by name",
             "/enb-info": "Information about all connected eNBs and their details (TAs, PLMNs, number of UEs)",
             "/ue-info": "Information about all connected LTE UEs (active eNB, TAI, PDN info)",
             "/pdu-info": "Information about all PDU sessions (IMSI/SUPI, DNN, IPs, S-NSSAI, QoS, state)",
