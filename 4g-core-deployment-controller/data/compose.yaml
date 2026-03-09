@@ -1,7 +1,7 @@
 services:
   mongo:
     image: mongo:6.0
-    container_name: mongo
+    container_name: ${DEPLOYMENT_PREFIX}-mongo
     command: --bind_ip 0.0.0.0
     volumes:
       - mongodbdata:/data/db
@@ -21,7 +21,7 @@ services:
         ipv4_address: ${MONGO_IP}
   webui:
     image: ghcr.io/tknika/docker_open5gs:v2.7.6-20260222
-    container_name: webui
+    container_name: ${DEPLOYMENT_PREFIX}-webui
     depends_on:
       - mongo
     environment:
@@ -43,7 +43,7 @@ services:
         ipv4_address: ${WEBUI_IP}
   hss:
     image: ghcr.io/tknika/docker_open5gs:v2.7.6-20260222
-    container_name: hss
+    container_name: ${DEPLOYMENT_PREFIX}-hss
     environment:
       - COMPONENT_NAME=hss
       - MNC=${MNC}
@@ -74,7 +74,7 @@ services:
     depends_on:
       - smf
       - upf
-    container_name: sgwc
+    container_name: ${DEPLOYMENT_PREFIX}-sgwc
     environment:
       - COMPONENT_NAME=sgwc
       - SGWU_IP=${SGWU_IP}
@@ -98,7 +98,7 @@ services:
     depends_on:
       - smf
       - upf
-    container_name: sgwu
+    container_name: ${DEPLOYMENT_PREFIX}-sgwu
     environment:
       - COMPONENT_NAME=sgwu
       - SGWU_IP=${SGWU_IP}
@@ -122,7 +122,7 @@ services:
         ipv4_address: ${SGWU_IP}
   smf:
     image: ghcr.io/tknika/docker_open5gs:v2.7.6-20260222
-    container_name: smf
+    container_name: ${DEPLOYMENT_PREFIX}-smf
     environment:
       - COMPONENT_NAME=smf
       - DEPLOY_MODE=4G
@@ -165,7 +165,7 @@ services:
     image: ghcr.io/tknika/docker_open5gs:v2.7.6-20260222
     depends_on:
       - smf
-    container_name: upf
+    container_name: ${DEPLOYMENT_PREFIX}-upf
     environment:
       - COMPONENT_NAME=upf
       - DNN_LIST=${DNN_LIST}
@@ -208,7 +208,7 @@ services:
       - smf
       - upf
       #- osmomsc
-    container_name: mme
+    container_name: ${DEPLOYMENT_PREFIX}-mme
     environment:
       - COMPONENT_NAME=mme
       - NETWORK_NAME=${NETWORK_NAME}
@@ -243,7 +243,7 @@ services:
         ipv4_address: ${MME_IP}
   pcrf:
     image: ghcr.io/tknika/docker_open5gs:v2.7.6-20260222
-    container_name: pcrf
+    container_name: ${DEPLOYMENT_PREFIX}-pcrf
     environment:
       - COMPONENT_NAME=pcrf
       - MONGO_IP=${MONGO_IP}
@@ -284,7 +284,7 @@ networks:
 
 volumes:
   mongodbdata:
-    name: docker_open5gs_mongodbdata
+    name: ${DEPLOYMENT_PREFIX}-mongodbdata
 
 x-metadata:
   id: 4g-core

@@ -1,7 +1,7 @@
 services:
-  4g-core-deployment-controller:
-    container_name: 4g-core-deployment-controller
-    image: ghcr.io/tknika/4g-core-deployment-controller:v0.3.1
+  deployment-controller:
+    container_name: ${DEPLOYMENT_PREFIX}-deployment-controller
+    image: ghcr.io/tknika/4g-core-deployment-controller:v0.4.2
     restart: unless-stopped
     expose:
       - 8000
@@ -11,14 +11,12 @@ services:
       - ENV_FILE=/data/.env
       - LOG_LEVEL=info
     volumes:
-      - ./compose.yaml:/data/compose.yaml
-      - ./.env:/data/.env
+      - ./:/data
       - /usr/bin/docker:/usr/bin/docker
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/libexec/docker/cli-plugins/docker-compose:/usr/libexec/docker/cli-plugins/docker-compose
     networks:
-      default:
-        ipv4_address: 172.22.0.200
+      - default
 
 networks:
   default:
@@ -27,3 +25,80 @@ networks:
     ipam:
       config:
         - subnet: ${INTERNAL_NETWORK_SUBNET}
+
+x-config-schema:
+  title: "4G core configuration"
+  description: "4g-core initial and editable configuration"
+
+  ui:
+    install_dialog_title: "4G Core Deployment Installation"
+    edit_dialog_title: "Edit 4G Core Configuration"
+    show_advanced_by_default: false
+
+  fields:
+    - key: OP
+      label: "OP (Operator Variant Algorithm Configuration Field)"
+      description: "Configuration field for operator variant algorithm in a 4G/5G Core Network"
+      data_type: string
+      semantic_type: hex
+      required: true
+      input_source: manual
+      default: ""
+      validators:
+        - type: regex
+          value: "^[0-9a-fA-F]{32}$"
+      mutable: true
+      apply_on_change: update_env
+    - key: advertise_ip
+      label: "Advertised IP address (SGWU)"
+      description: "Applied to SGWU_ADVERTISE_IP"
+      data_type: string
+      semantic_type: ip
+      required: true
+      input_source: manual_or_discovery
+      default: "0.0.0.0"
+      discovery:
+        source: host
+        value_from: ip
+        label_template: "{ip} - {type} - {interface_name}"
+      static_options:
+        - value: "0.0.0.0"
+          label: "0.0.0.0 (all interfaces)"
+      validators:
+        - type: regex
+          value: "^\\d{1,3}(\\.\\d{1,3}){3}$"
+      mutable: true
+      apply_on_change: update_env
+
+  bindings:
+    - field: OP
+      targets:
+        - service_env.OP
+    - field: advertise_ip
+      targets:
+        - service_env.SGWU_ADVERTISE_IP
+
+x-deployment-metadata-schema:
+  title: "4G Core metadata"
+  description: "4g-core metadata parameters"
+  fields:
+    - key: location.lat
+      label: "Latitude"
+      data_type: number
+      semantic_type: latitude
+      required: false
+      mutable: true
+      validators:
+        - type: range
+          min: -90
+          max: 90
+    - key: location.lon
+      label: "Longitude"
+      data_type: number
+      semantic_type: longitude
+      required: false
+      mutable: true
+      validators:
+        - type: range
+          min: -180
+          max: 180
