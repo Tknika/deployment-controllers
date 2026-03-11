@@ -1,0 +1,179 @@
+services:
+  deployment-controller:
+    container_name: ${DEPLOYMENT_PREFIX:-enb-virtual}-deployment-controller
+    image: enb-virtual-deployment-controller:v0.1.0
+    restart: unless-stopped
+    expose:
+      - 8000
+    environment:
+      - API_PORT=8000
+      - COMPOSE_FILE=/data/compose.yaml
+      - ENV_FILE=/data/.env
+      - LOG_LEVEL=info
+    volumes:
+      - ./:/data
+      - /usr/bin/docker:/usr/bin/docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/libexec/docker/cli-plugins/docker-compose:/usr/libexec/docker/cli-plugins/docker-compose
+    networks:
+      - default
+
+networks:
+  default:
+    external: true
+    name: docker_open5gs_default
+
+x-metadata:
+  id: enb-virtual
+  name: eNB Virtual
+  description: Virtual e-NodeB for testing purposes.
+  version: "0.1.0"
+  author: Tknika
+  changelog: "First release."
+  documentation_url: ""
+  provides:
+    - enb-virtual
+
+x-config-schema:
+  title: "eNB Virtual configuration"
+  description: "eNB Virtual initial and editable configuration"
+
+  ui:
+    install_dialog_title: "eNB Virtual Deployment Installation"
+    edit_dialog_title: "Edit eNB Virtual Configuration"
+    show_advanced_by_default: false
+
+  fields:
+    - key: ENB_ID
+      label: "eNB ID"
+      description: "Unique identifier for the virtual e-NodeB"
+      data_type: string
+      semantic_type: hex
+      required: true
+      input_source: manual
+      default: "0x19B"
+      validators:
+        - type: regex
+          value: "^0x[0-9a-fA-F]{3}$"
+      mutable: true
+      apply_on_change: update_env
+    - key: MCC
+      label: "MCC"
+      description: "Mobile Country Code"
+      data_type: string
+      semantic_type: mcc
+      required: true
+      input_source: manual_or_discovery
+      default: "001"
+      discovery:
+        source: env_vars
+        var_name: MCC
+      validators:
+        - type: regex
+          value: "^\\d{3}$"
+      mutable: true
+      apply_on_change: update_env
+    - key: MNC
+      label: "MNC"
+      description: "Mobile Network Code"
+      data_type: string
+      semantic_type: mnc
+      required: true
+      input_source: manual_or_discovery
+      default: "01"
+      discovery:
+        source: env_vars
+        var_name: MNC
+      validators:
+        - type: regex
+          value: "^\\d{2,3}$"
+      mutable: true
+      apply_on_change: update_env
+    - key: TAC
+      label: "TAC"
+      description: "Tracking Area Code"
+      data_type: string
+      semantic_type: tac
+      required: true
+      input_source: manual_or_discovery
+      default: "1"
+      discovery:
+        source: env_vars
+        var_name: TAC
+      validators:
+        - type: regex
+          value: "^\\d{1,5}$"
+      mutable: true
+      apply_on_change: update_env
+    - key: MME_IP
+      label: "MME IP"
+      description: "IP address of the Mobility Management Entity (MME)"
+      data_type: string
+      semantic_type: ip
+      required: true
+      input_source: manual_or_discovery
+      discovery:
+        source: env_vars
+        var_name: MME_IP
+      validators:
+        - type: regex
+          value: "^\\d{1,3}(\\.\\d{1,3}){3}$"
+      mutable: true
+      apply_on_change: update_env
+    - key: SRS_ENB_IP
+      label: "srsLTE eNB IP"
+      description: "IP address of the virtual eNB (srsLTE) container"
+      data_type: string
+      semantic_type: ip
+      required: true
+      input_source: manual
+      default: "172.22.0.50"
+      validators:
+        - type: regex
+          value: "^\\d{1,3}(\\.\\d{1,3}){3}$"
+      mutable: true
+      apply_on_change: update_env
+  bindings:
+    - field: ENB_ID
+      targets:
+        - service_env.ENB_ID
+    - field: MCC
+      targets:
+        - service_env.MCC
+    - field: MNC
+      targets:
+        - service_env.MNC
+    - field: TAC
+      targets:
+        - service_env.TAC
+    - field: MME_IP
+      targets:
+        - service_env.MME_IP
+    - field: SRS_ENB_IP
+      targets:
+        - service_env.SRS_ENB_IP
+
+x-deployment-metadata-schema:
+  title: "eNB Virtual metadata"
+  description: "eNB Virtual metadata parameters"
+  fields:
+    - key: location.lat
+      label: "Latitude"
+      data_type: number
+      semantic_type: latitude
+      required: false
+      mutable: true
+      validators:
+        - type: range
+          min: -90
+          max: 90
+    - key: location.lon
+      label: "Longitude"
+      data_type: number
+      semantic_type: longitude
+      required: false
+      mutable: true
+      validators:
+        - type: range
+          min: -180
+          max: 180
