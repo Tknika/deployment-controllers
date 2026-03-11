@@ -1,0 +1,69 @@
+services:
+  enb-virtual:
+    image: ghcr.io/tknika/docker_srslte:v23.11.0-20260311
+    container_name: ${DEPLOYMENT_PREFIX:-default}-enb-virtual
+    stdin_open: true
+    tty: true
+    privileged: true
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - COMPONENT_NAME=enb_zmq
+      - ENB_ID=${ENB_ID}
+      - MCC=${MCC}
+      - MNC=${MNC}
+      - TAC=${TAC}
+      - MME_IP=${MME_IP}
+      - SRS_ENB_IP=${SRS_ENB_IP}
+    expose:
+      - "36412/sctp"
+      - "2152/udp"
+      - "2000/tcp"
+      - "2001/tcp"
+    networks:
+      default:
+        ipv4_address: ${SRS_ENB_IP}
+
+networks:
+  default:
+    external: true
+    name: docker_open5gs_default
+
+x-env-vars:
+  ENB_ID:
+    name: eNB ID
+    description: Unique identifier for the virtual e-NodeB
+    default: "0x19B"
+    advanced: false
+    type: string:0;^(0x[0-9a-fA-F]+|\d+)$
+  MCC:
+    name: MCC
+    description: Mobile Country Code
+    default: "001"
+    advanced: false
+    type: string:0;^\d{3}$
+  MNC:
+    name: MNC
+    description: Mobile Network Code
+    default: "01"
+    advanced: false
+    type: string:0;^\d{2}$
+  TAC:
+    name: TAC
+    description: Tracking Area Code
+    default: "1"
+    advanced: false
+    type: string:0;^\d{1,5}$
+  MME_IP:
+    name: MME IP
+    description: IP address of the Mobility Management Entity (MME)
+    default: "172.22.0.9"
+    advanced: false
+    type: string:0;^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$
+  SRS_ENB_IP:
+    name: srsLTE eNB IP
+    description: IP address of the virtual eNB (srsLTE) container
+    default: "172.22.0.50"
+    advanced: true
+    type: string:0;^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$
